@@ -1,1 +1,1 @@
-# Utils subpackage
+# CLI subpackage

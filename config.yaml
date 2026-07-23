@@ -1,0 +1,64 @@
+# Cloud Auditor & Cost Optimizer Configuration
+
+cloud:
+  default_provider: "aws"
+  aws:
+    regions:
+      - "us-east-1"
+      - "us-west-2"
+      - "eu-west-1"
+    assume_role_arn: ""
+    profile_name: ""
+  gcp:
+    regions:
+      - "us-central1"
+      - "us-east1"
+      - "europe-west1"
+    project_id: ""
+
+rules:
+  # EC2 / GCE Instance scanning rules
+  ec2:
+    cpu_threshold_percent: 5.0      # Underutilized if avg CPU is below this %
+    network_threshold_mbytes: 10.0   # Underutilized if total network in/out is below this in MB
+    observation_days: 14            # Duration to analyze metrics for
+
+  # EBS / Persistent Disk scanning rules
+  ebs:
+    unused_days: 14                 # Flag volumes detached/unmodified for longer than this
+    large_volume_gb: 100            # Mark volumes larger than this as "large volume" candidates
+
+  # Elastic IP / External IP rules
+  elastic_ip:
+    idle_days: 7                    # Flag unassociated IPs or unused IPs
+
+pricing:
+  # Estimated monthly costs for savings calculation
+  aws:
+    ebs_gp3_per_gb_month: 0.08       # $0.08 per GB-month
+    ebs_gp2_per_gb_month: 0.10       # $0.10 per GB-month
+    elastic_ip_idle_hour: 0.005      # $0.005 per hour (~$3.60/month)
+    # Default estimated monthly costs for EC2 instance families if actual pricing API isn't queried
+    ec2_estimated_monthly:
+      t2.micro: 8.5
+      t2.small: 17.0
+      t2.medium: 34.0
+      t3.micro: 7.5
+      t3.small: 15.0
+      t3.medium: 30.0
+      m5.large: 70.0
+      m5.xlarge: 140.0
+      c5.large: 62.0
+      r5.large: 92.0
+      default_fallback: 50.0         # Fallback if instance type is unknown
+  gcp:
+    disk_pd_standard_per_gb_month: 0.04
+    disk_pd_ssd_per_gb_month: 0.17
+    external_ip_idle_hour: 0.010     # $0.010 per hour (~$7.20/month)
+    gce_estimated_monthly:
+      f1-micro: 5.0
+      g1-small: 14.0
+      n1-standard-1: 25.0
+      n1-standard-2: 50.0
+      e2-medium: 25.0
+      default_fallback: 40.0

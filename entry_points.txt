@@ -1,0 +1,2 @@
+[console_scripts]
+cloud-auditor = app.cli.main:app
